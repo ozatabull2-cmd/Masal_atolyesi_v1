@@ -7,8 +7,8 @@ import LoadingScreen from './components/LoadingScreen';
 import { generateIllustration, generateStoryText, generateSpeech } from './services/geminiService';
 import { Hourglass } from 'lucide-react';
 
-const QUOTA_LIMIT = 2;
-const RESET_PERIOD_MS = 12 * 60 * 60 * 1000; // 12 hours in ms
+const QUOTA_LIMIT = 1;
+const RESET_PERIOD_MS = 6 * 60 * 60 * 1000; // 12 hours in ms
 
 // List of valid promo codes (Existing + 10 Unpredictable)
 const PROMO_CODES = [
