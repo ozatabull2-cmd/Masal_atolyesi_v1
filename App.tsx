@@ -203,7 +203,7 @@ const BookForm: React.FC<{
                     Ankara Çocuk Etkinlikler İnstagram sayfamız takipçilerine özeldir.
                 </p>
                 
-                {/* DİNAMİK BİLGİLENDİRME ALANI - Burası otomatik değişir */}
+                {/* DİNAMİK BİLGİLENDİRME ALANI */}
                 <div className="bg-indigo-100/50 p-3 rounded-lg border border-indigo-200 text-sm text-indigo-800">
                     <p>Adil kullanım kuralları:</p>
                     <ul className="list-disc list-inside mt-1 space-y-1 text-xs sm:text-sm">
@@ -249,6 +249,21 @@ const BookForm: React.FC<{
                             {promoMessage.text}
                         </p>
                     )}
+
+                    {/* WhatsApp Promo Link - EKLENEN KISIM */}
+                    <div className="mt-4 bg-green-50 border border-green-200 rounded-xl p-3">
+                        <p className="text-xs text-green-800 mb-3 leading-relaxed">
+                            <span className="font-bold">🎁 +1 Ek Hak Fırsatı:</span> Etkinlikler ve Fırsat Alışveriş Rehberi grubumuza katılarak sabit mesaj kısmından promosyon kodunuzu hemen alabilirsiniz.
+                        </p>
+                        <a 
+                            href="https://chat.whatsapp.com/JJFgs0neRkLCtm0OAHzOeK" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#128C7E] text-white text-xs font-bold py-2.5 px-4 rounded-lg transition-colors shadow-sm"
+                        >
+                            <span>📱</span> WhatsApp Grubuna Katıl & Kodu Al
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
