@@ -1,0 +1,5 @@
+{
+  "name": "MasalAtölyesi",
+  "description": "A personalized children's storybook generator powered by Gemini. Creates illustrated fairytales based on child's age, name, and interests.",
+  "requestFramePermissions": []
+}
