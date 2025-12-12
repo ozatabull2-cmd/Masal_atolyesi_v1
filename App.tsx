@@ -38,7 +38,10 @@ interface StoryData {
 const QUOTA_LIMIT = 1; // 1 HAK
 const RESET_PERIOD_MS = 6 * 60 * 60 * 1000; // 6 SAAT
 const RESET_HOURS = RESET_PERIOD_MS / (1000 * 60 * 60); // Otomatik hesaplanan saat (Arayüz için)
-const API_KEY = ""; // Environment handles this
+
+// API ANAHTARI EKLENDİ
+const API_KEY = "AIzaSyBtUNhknOLNleM0cxxIsX4nkFZotscmo74"; 
+
 const STORAGE_KEY = 'masal_quota_v2'; 
 
 const PROMO_CODES = [
