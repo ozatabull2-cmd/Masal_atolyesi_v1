@@ -189,6 +189,24 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onReset }) => {
             format: 'a4'
         });
 
+        // Helper to add watermark
+        const addWatermark = (yPos: number) => {
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "bold");
+            
+            // Shadow (Simulated)
+            doc.setTextColor(0, 0, 0);
+            doc.text("@ankaracocuketkinlikler", 105.3, yPos + 0.3, { align: 'center' });
+            
+            // Text
+            doc.setTextColor(255, 255, 255);
+            doc.text("@ankaracocuketkinlikler", 105, yPos, { align: 'center' });
+            
+            // Reset to black for normal text
+            doc.setTextColor(0, 0, 0);
+            doc.setFont("helvetica", "normal");
+        };
+
         // Turkish char map for basic ASCII support in default PDF fonts
         const normalizeText = (str: string) => {
             return str.replace(/ğ/g, "g").replace(/Ğ/g, "G")
@@ -202,7 +220,9 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onReset }) => {
         // Cover Page
         if (story.coverImageUrl) {
             doc.addImage(story.coverImageUrl, 'PNG', 20, 40, 170, 170);
+            addWatermark(205); // Position inside the cover image at bottom
         }
+        
         doc.setFontSize(24);
         doc.text(normalizeText(story.title), 105, 230, { align: 'center', maxWidth: 170 });
         doc.setFontSize(12);
@@ -214,6 +234,7 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ story, onReset }) => {
             // Image
             if (page.imageUrl) {
                 doc.addImage(page.imageUrl, 'PNG', 20, 20, 170, 150);
+                addWatermark(165); // Position inside the story image at bottom
             }
             
             // Text (Bottom half)

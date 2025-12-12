@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { UserInput, AgeGroup, Gender } from '../types';
-import { Sparkles, BookOpen, Star, Heart, Palette, ChevronDown, ChevronUp, Info, Clock, AlertCircle, Ticket } from 'lucide-react';
+import { Sparkles, BookOpen, Star, Heart, Palette, ChevronDown, ChevronUp, Info, Clock, AlertCircle, Ticket, MessageCircle } from 'lucide-react';
 
 interface BookFormProps {
   onSubmit: (data: UserInput) => void;
@@ -124,14 +124,14 @@ const BookForm: React.FC<BookFormProps> = ({ onSubmit, isSubmitting, remainingQu
                     Adil kullanım için bazı kurallarımız vardır:
                 </p>
                 <ul className="mt-2 space-y-1 text-sm text-slate-600 list-disc list-inside marker:text-indigo-400">
-                    <li>Her kullanıcının <strong>12 saatte bir yenilenen 2 masal</strong> oluşturma hakkı vardır.</li>
+                    <li>Her kullanıcının <strong>6 saatte bir yenilenen 1 masal</strong> oluşturma hakkı vardır.</li>
                     <li>Oluşturulan masalları PDF olarak indirebilirsiniz.</li>
                 </ul>
                 
                 <div className="mt-4 flex flex-wrap items-center gap-4">
                     <div className={`px-4 py-2 rounded-lg border flex items-center gap-2 font-bold ${isQuotaFull ? 'bg-red-50 border-red-200 text-red-600' : 'bg-green-50 border-green-200 text-green-700'}`}>
                         <BookOpen className="w-4 h-4" />
-                        Kalan Hakkınız: {remainingQuota} / 2
+                        Kalan Hakkınız: {remainingQuota} / 1
                     </div>
                     {nextResetTime && timeLeft && (
                         <div className="px-4 py-2 rounded-lg bg-slate-50 border border-slate-200 flex items-center gap-2 text-slate-500 text-xs font-medium font-mono">
@@ -147,6 +147,24 @@ const BookForm: React.FC<BookFormProps> = ({ onSubmit, isSubmitting, remainingQu
                         <Ticket className="w-4 h-4 text-purple-500" />
                         <span className="text-sm font-bold text-purple-700">Promosyon Kodu</span>
                     </div>
+
+                    {!isPromoUsed && (
+                        <div className="mb-3 bg-green-50 p-3 rounded-xl border border-green-100">
+                            <p className="text-xs text-green-800 mb-2 leading-relaxed">
+                                🎁 <strong>+1 Ek Hak</strong> veren promosyon kodunu, WhatsApp grubumuza katılarak <strong>sabit mesaj</strong> kısmından alabilirsiniz.
+                            </p>
+                            <a 
+                                href="https://chat.whatsapp.com/JJFgs0neRkLCtm0OAHzOeK" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold py-2 rounded-lg transition-colors shadow-sm"
+                            >
+                                <MessageCircle className="w-4 h-4" />
+                                WhatsApp Grubuna Katıl
+                            </a>
+                        </div>
+                    )}
+
                     {isPromoUsed ? (
                          <div className="text-xs font-medium text-green-600 bg-green-50 px-3 py-2 rounded-lg inline-block border border-green-200">
                              ✨ Ekstra hak tanımlandı!
@@ -155,7 +173,7 @@ const BookForm: React.FC<BookFormProps> = ({ onSubmit, isSubmitting, remainingQu
                         <div className="flex gap-2 max-w-sm">
                             <input 
                                 type="text" 
-                                placeholder="Kodunuzu girin..." 
+                                placeholder="Kodu buraya girin..." 
                                 value={promoCode}
                                 onChange={(e) => setPromoCode(e.target.value)}
                                 className="flex-1 px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200"
