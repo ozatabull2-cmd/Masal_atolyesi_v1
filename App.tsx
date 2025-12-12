@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Hourglass, BookOpen, Sparkles, Volume2, VolumeX, ChevronRight, ChevronLeft, RefreshCw, Download, Play, Pause } from 'lucide-react';
+import { Hourglass, BookOpen, Sparkles, Volume2, VolumeX, ChevronRight, ChevronLeft, RefreshCw, Download, Play, Pause, Printer } from 'lucide-react';
 
 // --- TYPES ---
 enum AppState {
@@ -39,7 +39,7 @@ const QUOTA_LIMIT = 1; // 1 HAK
 const RESET_PERIOD_MS = 6 * 60 * 60 * 1000; // 6 SAAT
 const RESET_HOURS = RESET_PERIOD_MS / (1000 * 60 * 60); // Otomatik hesaplanan saat (Arayüz için)
 
-// API ANAHTARI EKLENDİ
+// API ANAHTARI
 const API_KEY = "AIzaSyBtUNhknOLNleM0cxxIsX4nkFZotscmo74"; 
 
 const STORAGE_KEY = 'masal_quota_v2'; 
@@ -49,7 +49,7 @@ const PROMO_CODES = [
   "V3N7C4", "J8D5F2", "M6G9Z1", "R4K3L7", "S5T8P2", "Y1W9Q6"
 ];
 
-// --- SERVICES (MOCKED / REAL IMPLEMENTATION) ---
+// --- SERVICES ---
 
 // 1. Generate Story Text (Gemini Flash)
 const generateStoryText = async (input: UserInput): Promise<StoryData> => {
@@ -102,7 +102,6 @@ const generateStoryText = async (input: UserInput): Promise<StoryData> => {
 // 2. Generate Illustration (Imagen)
 const generateIllustration = async (prompt: string): Promise<string> => {
   try {
-    // Fallback prompt enhancements for better style
     const enhancedPrompt = `${prompt} . Children's book illustration style, warm colors, magical atmosphere, high quality, 4k resolution, soft lighting. No text.`;
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${API_KEY}`, {
@@ -193,68 +192,73 @@ const BookForm: React.FC<{
   const advices = ['Paylaşmak Güzeldir', 'Cesaret', 'Dürüstlük', 'Doğa Sevgisi', 'Arkadaşlık', 'Uyku Vakti', 'Diğer...'];
 
   return (
-    <div className="w-full max-w-2xl bg-white rounded-3xl shadow-xl overflow-hidden animate-fade-in">
+    <div className="w-full max-w-2xl bg-white rounded-3xl shadow-xl overflow-hidden animate-fade-in border border-indigo-50">
       {/* Header Info Box */}
-      <div className="bg-indigo-50 p-6 border-b border-indigo-100">
+      <div className="bg-indigo-50/80 p-6 border-b border-indigo-100">
         <div className="flex items-start gap-4">
-            <div className="bg-indigo-100 p-2 rounded-full">
+            <div className="bg-white p-3 rounded-full shadow-sm">
                 <BookOpen className="w-6 h-6 text-indigo-600" />
             </div>
-            <div>
+            <div className="flex-1">
                 <h2 className="text-lg font-bold text-indigo-900">Hoş Geldiniz!</h2>
-                <p className="text-sm text-indigo-700 mt-1 mb-2">
+                <p className="text-sm text-indigo-700 mt-1 mb-3">
                     Ankara Çocuk Etkinlikler İnstagram sayfamız takipçilerine özeldir.
                 </p>
                 
                 {/* DİNAMİK BİLGİLENDİRME ALANI */}
-                <div className="bg-indigo-100/50 p-3 rounded-lg border border-indigo-200 text-sm text-indigo-800">
-                    <p>Adil kullanım kuralları:</p>
-                    <ul className="list-disc list-inside mt-1 space-y-1 text-xs sm:text-sm">
+                <div className="bg-white/80 backdrop-blur-sm p-3 rounded-xl border border-indigo-200 text-sm text-indigo-800 shadow-sm">
+                    <p className="font-semibold mb-1 flex items-center gap-2">
+                        <Hourglass size={14} className="text-indigo-500"/> Adil kullanım kuralları:
+                    </p>
+                    <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm text-indigo-700">
                         <li>
                            Her kullanıcının <strong>{RESET_HOURS} saatte bir yenilenen {QUOTA_LIMIT} masal</strong> oluşturma hakkı vardır.
                         </li>
+                        <li>Oluşturulan masalları PDF olarak indirebilirsiniz.</li>
                     </ul>
                 </div>
 
-                <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-4">
-                     <div className={`px-4 py-2 rounded-lg font-bold text-sm inline-flex items-center gap-2 ${remainingQuota > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                     <div className={`px-4 py-2 rounded-lg font-bold text-sm inline-flex items-center gap-2 shadow-sm transition-colors ${remainingQuota > 0 ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-red-100 text-red-700 border border-red-200'}`}>
                         <BookOpen size={16}/>
                         Kalan Hakkınız: {remainingQuota} / {QUOTA_LIMIT}
                      </div>
                      {nextResetTime && remainingQuota < QUOTA_LIMIT && (
-                         <div className="text-xs text-slate-500">
+                         <div className="text-xs text-slate-500 font-medium bg-slate-100 px-3 py-2 rounded-lg">
                              Yenilenme: {new Date(nextResetTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                          </div>
                      )}
                 </div>
                 
                 {/* Promo Code Section */}
-                <div className="mt-4 pt-4 border-t border-indigo-200/50">
-                    <label className="text-xs font-bold text-indigo-400 uppercase tracking-wide mb-2 block">Promosyon Kodu</label>
+                <div className="mt-5 pt-4 border-t border-indigo-200/50">
+                    <label className="text-xs font-bold text-indigo-400 uppercase tracking-wide mb-2 block flex items-center gap-1">
+                        <Sparkles size={12}/> Promosyon Kodu
+                    </label>
                     <div className="flex gap-2">
                         <input 
                             type="text" 
                             value={promoCode}
                             onChange={(e) => setPromoCode(e.target.value)}
                             placeholder="Kodunuzu girin..."
-                            className="flex-1 border border-indigo-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                            className="flex-1 border border-indigo-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
                         />
                         <button 
                             onClick={handlePromoSubmit}
                             disabled={!promoCode.trim()}
-                            className="bg-purple-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-purple-600 disabled:opacity-50 transition-colors"
+                            className="bg-purple-600 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-purple-700 disabled:opacity-50 transition-colors shadow-sm"
                         >
                             Kullan
                         </button>
                     </div>
                     {promoMessage && (
-                        <p className={`text-xs mt-2 ${promoMessage.type === 'success' ? 'text-green-600' : 'text-red-500'}`}>
+                        <p className={`text-xs mt-2 font-medium ${promoMessage.type === 'success' ? 'text-green-600' : 'text-red-500'}`}>
                             {promoMessage.text}
                         </p>
                     )}
 
-                    {/* WhatsApp Promo Link - EKLENEN KISIM */}
-                    <div className="mt-4 bg-green-50 border border-green-200 rounded-xl p-3">
+                    {/* WhatsApp Promo Link */}
+                    <div className="mt-4 bg-[#f0fdf4] border border-green-200 rounded-xl p-3 shadow-sm">
                         <p className="text-xs text-green-800 mb-3 leading-relaxed">
                             <span className="font-bold">🎁 +1 Ek Hak Fırsatı:</span> Etkinlikler ve Fırsat Alışveriş Rehberi grubumuza katılarak sabit mesaj kısmından promosyon kodunuzu hemen alabilirsiniz.
                         </p>
@@ -272,23 +276,23 @@ const BookForm: React.FC<{
         </div>
       </div>
 
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 text-white text-center">
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-700 p-6 text-white text-center shadow-inner">
         <h1 className="text-3xl font-bold flex items-center justify-center gap-2">
           <Sparkles className="w-8 h-8 text-yellow-300" />
           Masal Atölyesi
         </h1>
-        <p className="text-indigo-100 mt-2">Çocuğunuz için sihirli bir hikaye oluşturun.</p>
+        <p className="text-indigo-100 mt-2 text-sm opacity-90">Çocuğunuz için sihirli bir hikaye oluşturun.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-8 space-y-8">
-        {/* Form Fields (Same as before) */}
+      <form onSubmit={handleSubmit} className="p-8 space-y-8 bg-white">
+        {/* Form Fields */}
         <div>
-          <label className="block text-slate-700 font-bold mb-2">Çocuğun İsmi</label>
+          <label className="block text-slate-700 font-bold mb-2 text-sm uppercase tracking-wide">Çocuğun İsmi</label>
           <input
             type="text"
             value={formData.childName}
             onChange={(e) => setFormData({ ...formData, childName: e.target.value })}
-            className="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-lg focus:border-indigo-500 focus:ring-0 transition-colors"
+            className="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-lg focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
             placeholder="Örn: Ayşe, Can..."
             required
           />
@@ -297,17 +301,17 @@ const BookForm: React.FC<{
         {/* Age & Gender Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-                <label className="block text-slate-700 font-bold mb-3">Yaş Grubu</label>
+                <label className="block text-slate-700 font-bold mb-3 text-sm uppercase tracking-wide">Yaş Grubu</label>
                 <div className="flex gap-2">
                     {ageGroups.map(age => (
                         <button
                             key={age}
                             type="button"
                             onClick={() => setFormData({...formData, ageGroup: age})}
-                            className={`flex-1 py-2 rounded-lg font-medium border-2 transition-all ${
+                            className={`flex-1 py-3 rounded-xl font-medium border-2 transition-all ${
                                 formData.ageGroup === age 
-                                ? 'bg-indigo-500 border-indigo-500 text-white' 
-                                : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300'
+                                ? 'bg-indigo-600 border-indigo-600 text-white shadow-md transform scale-105' 
+                                : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:bg-slate-50'
                             }`}
                         >
                             {age}
@@ -316,17 +320,17 @@ const BookForm: React.FC<{
                 </div>
             </div>
             <div>
-                <label className="block text-slate-700 font-bold mb-3">Cinsiyet</label>
+                <label className="block text-slate-700 font-bold mb-3 text-sm uppercase tracking-wide">Cinsiyet</label>
                 <div className="flex gap-2 flex-wrap">
                     {genders.map(g => (
                         <button
                             key={g}
                             type="button"
                             onClick={() => setFormData({...formData, gender: g})}
-                            className={`px-4 py-2 rounded-lg font-medium border-2 transition-all ${
+                            className={`px-4 py-3 rounded-xl font-medium border-2 transition-all flex-1 ${
                                 formData.gender === g
-                                ? 'bg-pink-500 border-pink-500 text-white' 
-                                : 'bg-white border-slate-200 text-slate-600 hover:border-pink-300'
+                                ? 'bg-pink-500 border-pink-500 text-white shadow-md transform scale-105' 
+                                : 'bg-white border-slate-200 text-slate-600 hover:border-pink-300 hover:bg-pink-50'
                             }`}
                         >
                             {g}
@@ -338,8 +342,8 @@ const BookForm: React.FC<{
 
         {/* Theme Selection */}
         <div>
-            <label className="block text-slate-700 font-bold mb-3 flex items-center gap-2">
-                <Sparkles size={18} className="text-yellow-500"/> Masal Konusu
+            <label className="block text-slate-700 font-bold mb-3 flex items-center gap-2 text-sm uppercase tracking-wide">
+                <Sparkles size={16} className="text-yellow-500"/> Masal Konusu
             </label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {themes.map(theme => (
@@ -347,10 +351,10 @@ const BookForm: React.FC<{
                         key={theme}
                         type="button"
                         onClick={() => setFormData({...formData, theme: theme})}
-                        className={`py-3 px-2 rounded-xl text-sm font-medium border transition-all ${
+                        className={`py-3 px-2 rounded-xl text-sm font-medium border-2 transition-all ${
                             formData.theme === theme
-                            ? 'bg-yellow-100 border-yellow-400 text-yellow-800 shadow-sm'
-                            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                            ? 'bg-yellow-50 border-yellow-400 text-yellow-800 shadow-md transform scale-[1.02]'
+                            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-yellow-200'
                         }`}
                     >
                         {theme}
@@ -361,7 +365,7 @@ const BookForm: React.FC<{
 
         {/* Advice Selection */}
         <div>
-            <label className="block text-slate-700 font-bold mb-3 flex items-center gap-2">
+            <label className="block text-slate-700 font-bold mb-3 flex items-center gap-2 text-sm uppercase tracking-wide">
                 <span className="text-red-500">❤️</span> Öğüt / Tema
             </label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -370,10 +374,10 @@ const BookForm: React.FC<{
                         key={item}
                         type="button"
                         onClick={() => setFormData({...formData, advice: item})}
-                        className={`py-3 px-2 rounded-xl text-sm font-medium border transition-all ${
+                        className={`py-3 px-2 rounded-xl text-sm font-medium border-2 transition-all ${
                             formData.advice === item
-                            ? 'bg-red-50 border-red-300 text-red-800 shadow-sm'
-                            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                            ? 'bg-red-50 border-red-300 text-red-800 shadow-md transform scale-[1.02]'
+                            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-red-200'
                         }`}
                     >
                         {item}
@@ -385,7 +389,7 @@ const BookForm: React.FC<{
         <button
           type="submit"
           disabled={isSubmitting || remainingQuota <= 0}
-          className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xl font-bold py-4 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xl font-bold py-4 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
         >
           <Sparkles className="w-6 h-6 animate-pulse" />
           Masalı Oluştur
@@ -398,7 +402,7 @@ const BookForm: React.FC<{
 // 2. Loading Screen
 const LoadingScreen: React.FC<{ status: 'story' | 'images', progress?: number }> = ({ status, progress = 0 }) => {
     return (
-        <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-3xl shadow-xl p-12 text-center max-w-md mx-auto animate-fade-in">
+        <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-3xl shadow-xl p-12 text-center max-w-md mx-auto animate-fade-in border border-indigo-50">
             {status === 'story' ? (
                 <>
                     <div className="w-24 h-24 mb-6 relative">
@@ -411,7 +415,7 @@ const LoadingScreen: React.FC<{ status: 'story' | 'images', progress?: number }>
                 </>
             ) : (
                 <>
-                    <div className="w-full bg-slate-100 rounded-full h-4 mb-6 overflow-hidden">
+                    <div className="w-full bg-slate-100 rounded-full h-4 mb-6 overflow-hidden relative">
                         <div 
                             className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full transition-all duration-500 ease-out"
                             style={{ width: `${progress}%` }}
@@ -442,18 +446,18 @@ const AudioPlayer: React.FC<{ audioBase64?: string }> = ({ audioBase64 }) => {
          const wavHeader = new ArrayBuffer(44);
          const view = new DataView(wavHeader);
          
-         view.setUint32(0, 0x52494646, false); // "RIFF"
+         view.setUint32(0, 0x52494646, false); 
          view.setUint32(4, 36 + bytes.length, true);
-         view.setUint32(8, 0x57415645, false); // "WAVE"
-         view.setUint32(12, 0x666d7420, false); // "fmt "
+         view.setUint32(8, 0x57415645, false); 
+         view.setUint32(12, 0x666d7420, false); 
          view.setUint32(16, 16, true);
          view.setUint16(20, 1, true);
-         view.setUint16(22, 1, true); // Mono
+         view.setUint16(22, 1, true); 
          view.setUint32(24, 24000, true); 
          view.setUint32(28, 24000 * 2, true);
          view.setUint16(32, 2, true);
          view.setUint16(34, 16, true);
-         view.setUint32(36, 0x64617461, false); // "data"
+         view.setUint32(36, 0x64617461, false); 
          view.setUint32(40, bytes.length, true);
 
          const blob = new Blob([view, bytes], { type: 'audio/wav' });
@@ -483,7 +487,7 @@ const AudioPlayer: React.FC<{ audioBase64?: string }> = ({ audioBase64 }) => {
     if (!audioBase64) return null;
 
     return (
-        <div className="mt-4">
+        <div className="mt-4 no-print">
             <audio 
                 ref={audioRef} 
                 src={src || undefined} 
@@ -492,7 +496,7 @@ const AudioPlayer: React.FC<{ audioBase64?: string }> = ({ audioBase64 }) => {
             />
             <button 
                 onClick={togglePlay}
-                className="flex items-center gap-2 bg-indigo-100 text-indigo-700 px-4 py-2 rounded-full hover:bg-indigo-200 transition-colors font-semibold"
+                className="flex items-center gap-2 bg-indigo-100 text-indigo-700 px-4 py-2 rounded-full hover:bg-indigo-200 transition-colors font-semibold shadow-sm"
             >
                 {isPlaying ? <Pause size={20} /> : <Play size={20} />}
                 {isPlaying ? "Durdur" : "Dinle"}
@@ -515,23 +519,49 @@ const StoryViewer: React.FC<{ story: StoryData; onReset: () => void }> = ({ stor
     const handlePrev = () => {
         if (pageIndex > -1) setPageIndex(pageIndex - 1);
     };
+    
+    // PDF/Print Handler
+    const handlePrint = () => {
+        window.print();
+    };
 
     return (
         <div className="w-full max-w-4xl mx-auto perspective-1000">
-            <div className="bg-white rounded-3xl shadow-2xl overflow-hidden min-h-[600px] relative flex flex-col md:flex-row">
+            {/* Print Styles */}
+            <style>{`
+                @media print {
+                  body * { visibility: hidden; }
+                  #story-container, #story-container * { visibility: visible; }
+                  #story-container { 
+                    position: absolute; 
+                    left: 0; 
+                    top: 0; 
+                    width: 100%; 
+                    margin: 0;
+                    padding: 0;
+                    background: white;
+                    box-shadow: none !important;
+                  }
+                  .no-print { display: none !important; }
+                  /* Print için resmi küçültme ve sayfaya sığdırma */
+                  img { max-height: 400px; object-fit: contain; margin-bottom: 20px; }
+                }
+            `}</style>
+
+            <div id="story-container" className="bg-white rounded-3xl shadow-2xl overflow-hidden min-h-[600px] relative flex flex-col md:flex-row border border-slate-200">
                 
                 {/* Image Section */}
-                <div className="w-full md:w-1/2 h-[300px] md:h-auto bg-slate-200 relative">
+                <div className="w-full md:w-1/2 h-[350px] md:h-auto bg-slate-100 relative border-b md:border-b-0 md:border-r border-slate-200">
                      <img 
                         src={pageIndex === -1 ? story.coverImageUrl : currentPage?.imageUrl} 
                         alt="Story Illustration" 
                         className="w-full h-full object-cover"
                      />
-                     <div className="absolute inset-0 flex items-center justify-between p-4 md:hidden pointer-events-none">
-                        <button onClick={handlePrev} disabled={pageIndex === -1} className="p-2 bg-black/30 text-white rounded-full pointer-events-auto disabled:opacity-0">
+                     <div className="absolute inset-0 flex items-center justify-between p-4 md:hidden pointer-events-none no-print">
+                        <button onClick={handlePrev} disabled={pageIndex === -1} className="p-2 bg-black/30 text-white rounded-full pointer-events-auto disabled:opacity-0 backdrop-blur-sm">
                             <ChevronLeft />
                         </button>
-                        <button onClick={handleNext} disabled={isLastPage} className="p-2 bg-black/30 text-white rounded-full pointer-events-auto disabled:opacity-0">
+                        <button onClick={handleNext} disabled={isLastPage} className="p-2 bg-black/30 text-white rounded-full pointer-events-auto disabled:opacity-0 backdrop-blur-sm">
                             <ChevronRight />
                         </button>
                      </div>
@@ -539,24 +569,35 @@ const StoryViewer: React.FC<{ story: StoryData; onReset: () => void }> = ({ stor
 
                 {/* Text Section */}
                 <div className="w-full md:w-1/2 p-8 flex flex-col justify-between bg-[#fffcf5]">
-                    <div className="flex justify-between items-center mb-6">
-                        <button onClick={onReset} className="text-slate-400 hover:text-slate-600 flex items-center gap-1 text-sm">
-                            <RefreshCw size={14}/> Yeni Masal
+                    <div className="flex justify-between items-center mb-6 no-print">
+                        <button onClick={onReset} className="text-slate-500 hover:text-indigo-600 flex items-center gap-1 text-sm font-medium transition-colors">
+                            <ChevronLeft size={16}/> Ana Menü
                         </button>
-                        <div className="text-slate-400 text-sm font-mono">
-                            {pageIndex === -1 ? "Kapak" : `${pageIndex + 1} / ${story.pages.length}`}
+                        
+                        <div className="flex items-center gap-3">
+                             <button 
+                                onClick={handlePrint}
+                                title="Yazdır / PDF Kaydet"
+                                className="text-slate-400 hover:text-indigo-600 transition-colors p-2 hover:bg-indigo-50 rounded-full"
+                            >
+                                <Printer size={18} />
+                            </button>
+                            <div className="text-slate-400 text-sm font-mono bg-slate-100 px-2 py-1 rounded">
+                                {pageIndex === -1 ? "Kapak" : `${pageIndex + 1} / ${story.pages.length}`}
+                            </div>
                         </div>
                     </div>
 
                     <div className="flex-1 overflow-y-auto">
                         {pageIndex === -1 ? (
                             <div className="text-center mt-12">
-                                <h1 className="text-4xl font-serif font-bold text-slate-800 mb-4 text-balance">{story.title}</h1>
+                                <h1 className="text-4xl font-serif font-bold text-slate-800 mb-6 text-balance leading-tight">{story.title}</h1>
+                                <div className="w-16 h-1 bg-indigo-500 mx-auto rounded-full mb-6"></div>
                                 <p className="text-slate-500 italic">Okumaya başlamak için ilerleyin...</p>
                             </div>
                         ) : (
                             <div className="animate-fade-in">
-                                <p className="text-xl font-serif leading-relaxed text-slate-800 text-balance">
+                                <p className="text-xl font-serif leading-relaxed text-slate-800 text-balance first-letter:text-5xl first-letter:font-bold first-letter:text-indigo-600 first-letter:mr-1 first-letter:float-left">
                                     {currentPage?.text}
                                 </p>
                                 <AudioPlayer audioBase64={currentPage?.audioBase64} />
@@ -564,11 +605,11 @@ const StoryViewer: React.FC<{ story: StoryData; onReset: () => void }> = ({ stor
                         )}
                     </div>
 
-                    <div className="flex justify-between items-center mt-8 pt-4 border-t border-slate-100">
+                    <div className="flex justify-between items-center mt-8 pt-6 border-t border-slate-100 no-print">
                          <button 
                             onClick={handlePrev} 
                             disabled={pageIndex === -1}
-                            className="flex items-center gap-2 text-slate-600 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors font-bold"
+                            className="flex items-center gap-2 text-slate-600 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors font-bold px-4 py-2 hover:bg-slate-50 rounded-lg"
                         >
                             <ChevronLeft size={20} /> Geri
                          </button>
@@ -576,7 +617,7 @@ const StoryViewer: React.FC<{ story: StoryData; onReset: () => void }> = ({ stor
                          <button 
                             onClick={handleNext} 
                             disabled={isLastPage}
-                            className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-full hover:bg-indigo-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-md font-bold"
+                            className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-full hover:bg-indigo-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg shadow-indigo-200 font-bold"
                         >
                             {isLastPage ? "Son" : "İleri"} <ChevronRight size={20} />
                          </button>
@@ -605,7 +646,7 @@ const CooldownView: React.FC<{ target: number; onComplete: () => void }> = ({ ta
     }, [target, onComplete]);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-3xl shadow-xl p-8 text-center max-w-md mx-auto animate-fade-in">
+        <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-3xl shadow-xl p-8 text-center max-w-md mx-auto animate-fade-in border border-indigo-50">
             <div className="bg-indigo-100 p-6 rounded-full mb-6 animate-pulse">
                 <Hourglass className="w-12 h-12 text-indigo-600" />
             </div>
@@ -613,10 +654,10 @@ const CooldownView: React.FC<{ target: number; onComplete: () => void }> = ({ ta
             <p className="text-slate-500 mb-8">
                 Sihirli değneğimizin soğuması gerekiyor. Yeni bir masal oluşturmadan önce lütfen bekle.
             </p>
-            <div className="text-6xl font-bold text-indigo-500 font-mono mb-4">
+            <div className="text-6xl font-bold text-indigo-500 font-mono mb-4 bg-indigo-50 w-32 h-32 rounded-full flex items-center justify-center mx-auto">
                 {secondsLeft}
             </div>
-            <p className="text-sm text-indigo-300 font-bold uppercase tracking-wider">Saniye Kaldı</p>
+            <p className="text-sm text-indigo-400 font-bold uppercase tracking-wider">Saniye Kaldı</p>
         </div>
     );
 };
@@ -641,21 +682,18 @@ function App() {
   }, []);
 
   const checkQuota = () => {
-    // UPDATED: Using new STORAGE_KEY
     const storedData = localStorage.getItem(STORAGE_KEY);
     if (storedData) {
         const { count, resetTime } = JSON.parse(storedData);
         const now = Date.now();
 
         if (resetTime && now > resetTime) {
-            // Time expired, reset quota
             resetQuota();
         } else {
             setRemainingQuota(QUOTA_LIMIT - count);
             setNextResetTime(resetTime);
         }
     } else {
-        // First time user (or after version reset)
         setRemainingQuota(QUOTA_LIMIT);
         setNextResetTime(null);
     }
@@ -681,7 +719,6 @@ function App() {
 
       const newCount = count + 1;
       
-      // If no reset time is set, set it now
       if (!resetTime && newCount > 0) {
           resetTime = Date.now() + RESET_PERIOD_MS;
       }
@@ -700,7 +737,7 @@ function App() {
         return { success: false, message: "Geçersiz promosyon kodu." };
     }
 
-    if (localStorage.getItem('masal_promo_used_v2')) { // Also updated promo key
+    if (localStorage.getItem('masal_promo_used_v2')) { 
         return { success: false, message: "Bu cihazda daha önce promosyon kodu kullanıldı." };
     }
 
@@ -714,7 +751,6 @@ function App() {
         resetTime = parsed.resetTime;
     }
 
-    // Add extra right by reducing count
     const newCount = currentCount - 1;
     const newData = { count: newCount, resetTime };
     
@@ -736,15 +772,12 @@ function App() {
     setAppState(AppState.GeneratingStory);
 
     try {
-      // 1. Generate Text Structure
       const generatedStory = await generateStoryText(input);
       
-      // Decrement quota immediately
       decrementQuota();
 
       setCooldownTarget(Date.now() + 5000); 
 
-      // 2. Start Image and Audio Generation Phase
       setAppState(AppState.GeneratingImages);
       setLoadingProgress(10); 
 
@@ -756,7 +789,6 @@ function App() {
         setLoadingProgress(10 + (completedTasks / totalTasks) * 90);
       };
 
-      // Generate Cover Image
       const coverPromise = generateIllustration(`${generatedStory.coverImagePrompt}`)
         .then(url => {
             updateProgress();
@@ -764,13 +796,11 @@ function App() {
         })
         .catch(() => "https://via.placeholder.com/512?text=Kapak");
 
-      // Generate Page Images and Audio
       const pagesPromise = Promise.all(
         generatedStory.pages.map(async (page) => {
             let imageUrl = "https://via.placeholder.com/512";
             let audioBase64 = "";
 
-            // Image Task
             const imageTask = async () => {
                 try {
                     imageUrl = await generateIllustration(page.imagePrompt);
@@ -781,7 +811,6 @@ function App() {
                 }
             };
 
-            // Audio Task
             const audioTask = async () => {
                 try {
                    audioBase64 = await generateSpeech(page.text);
@@ -854,13 +883,13 @@ function App() {
 
       case AppState.Error:
         return (
-          <div className="text-center p-8 bg-white rounded-3xl shadow-xl max-w-lg animate-fade-in">
+          <div className="text-center p-8 bg-white rounded-3xl shadow-xl max-w-lg animate-fade-in border border-red-100">
             <div className="text-5xl mb-4">😿</div>
             <h3 className="text-xl font-bold text-red-500 mb-2">Bir Hata Oluştu</h3>
             <p className="text-slate-600 mb-6">{errorMsg}</p>
             <button 
               onClick={resetApp}
-              className="bg-indigo-500 text-white px-6 py-2 rounded-full font-bold hover:bg-indigo-600"
+              className="bg-indigo-600 text-white px-8 py-3 rounded-full font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
             >
               Tekrar Dene
             </button>
