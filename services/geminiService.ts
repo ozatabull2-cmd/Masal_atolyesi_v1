@@ -2,7 +2,7 @@
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { UserInput, StoryData, AgeGroup } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // Helper to map age to word count constraints
 const getConstraintsForAge = (age: AgeGroup): string => {
